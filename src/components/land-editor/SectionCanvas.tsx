@@ -473,6 +473,11 @@ export default function SectionCanvas({
     const pos = getCanvasPos(e);
 
     if (isDrawing) {
+      // Don't allow points outside the land boundary
+      if (landBoundary.length >= 3 && !isPointInPolygon(pos, landBoundary)) {
+        return;
+      }
+
       // Check if clicking near first point to close
       if (
         drawingPoints.length >= 3 &&
@@ -677,7 +682,7 @@ export default function SectionCanvas({
             cursor: isPanning
               ? "grabbing"
               : isDrawing
-              ? "crosshair"
+              ? (mousePos && landBoundary.length >= 3 && !isPointInPolygon(mousePos, landBoundary) ? "not-allowed" : "crosshair")
               : hoveredSection
               ? "pointer"
               : "default",

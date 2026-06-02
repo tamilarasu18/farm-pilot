@@ -241,6 +241,24 @@ export default function LandDetailPage({ params }: { params: Promise<{ id: strin
     }
   };
 
+  const handleClearSectionShape = async (sectionId: string) => {
+    try {
+      const updated = await api.updateSection(sectionId, {
+        boundary_points: [] as any,
+        area_acres: null as any,
+      });
+      setSections(sections.map((s) => (s.id === sectionId ? updated : s)));
+      setSaveMessage("Section shape cleared!");
+      setTimeout(() => setSaveMessage(""), 3000);
+      if (selectedSectionId === sectionId) {
+        setSelectedSectionId(null);
+      }
+    } catch {
+      setSaveMessage("Failed to clear section shape");
+      setTimeout(() => setSaveMessage(""), 3000);
+    }
+  };
+
   const handleQuickAddSection = async () => {
     if (!quickAddName.trim()) return;
     try {
@@ -742,6 +760,19 @@ export default function LandDetailPage({ params }: { params: Promise<{ id: strin
 
                         {/* Actions */}
                         <div className="flex gap-1">
+                          {hasShape && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleClearSectionShape(section.id);
+                              }}
+                              className="btn btn-ghost btn-sm"
+                              style={{ color: "var(--color-warning)", padding: "6px 8px", fontSize: "16px" }}
+                              title="Clear shape"
+                            >
+                              ✖️
+                            </button>
+                          )}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
