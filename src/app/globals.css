@@ -26,9 +26,9 @@
   --color-accent-dark: #B07D4F;
 
   /* Surface */
-  --color-surface: #1A2E23;
-  --color-surface-light: #243B2E;
-  --color-surface-lighter: #2E4A39;
+  --color-surface: #FFFFFF;
+  --color-surface-light: #F3F4F6;
+  --color-surface-lighter: #E5E7EB;
 
   /* Status */
   --color-error: #EF5350;
@@ -38,14 +38,14 @@
 }
 
 :root {
-  --background: #0F1A14;
-  --foreground: #E8F5E9;
-  --text-secondary: #A5D6A7;
-  --text-muted: #6B8F7B;
-  --border: #2E4A39;
-  --glass-bg: rgba(26, 46, 35, 0.7);
-  --glass-border: rgba(64, 145, 108, 0.2);
-  --shadow-glow: 0 0 20px rgba(45, 106, 79, 0.15);
+  --background: #FAFAFA;
+  --foreground: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.05);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -94,10 +94,10 @@ body {
 }
 
 .glass-subtle {
-  background: rgba(26, 46, 35, 0.4);
+  background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(64, 145, 108, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-md);
 }
 
@@ -188,7 +188,7 @@ body {
 .input-field {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(26, 46, 35, 0.5);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   color: var(--foreground);

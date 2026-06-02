@@ -109,7 +109,7 @@ export default function LandCanvas({
     ctx.scale(dpr, dpr);
 
     // Clear
-    ctx.fillStyle = "#0F1A14";
+    ctx.fillStyle = "#E8F5E9"; // Light green background
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
 
     // Grid
@@ -653,14 +653,14 @@ export default function LandCanvas({
             >
               <div
                 style={{
-                  background: "rgba(15, 26, 20, 0.92)",
+                  background: "rgba(255, 255, 255, 0.92)",
                   backdropFilter: "blur(16px)",
                   WebkitBackdropFilter: "blur(16px)",
                   border: "1px solid rgba(212, 163, 115, 0.35)",
                   borderRadius: 14,
                   padding: "16px",
                   boxShadow:
-                    "0 8px 32px rgba(0,0,0,0.4), 0 0 24px rgba(212, 163, 115, 0.08)",
+                    "0 8px 32px rgba(0,0,0,0.1), 0 0 24px rgba(212, 163, 115, 0.08)",
                 }}
               >
                 {/* Header */}
@@ -723,7 +723,7 @@ export default function LandCanvas({
                       style={{
                         fontSize: 13,
                         fontWeight: 600,
-                        color: "#E8F5E9",
+                        color: "#111827",
                         lineHeight: 1.2,
                       }}
                     >

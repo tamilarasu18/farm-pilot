@@ -171,7 +171,7 @@ export default function SectionCanvas({
     ctx.scale(dpr, dpr);
 
     // Clear
-    ctx.fillStyle = "#0F1A14";
+    ctx.fillStyle = "#E8F5E9"; // Light green background
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
 
     // Grid (drawn in screen space, scaled for zoom feel)
@@ -261,8 +261,8 @@ export default function SectionCanvas({
       const pillY = centroid.y - pillH / 2;
       ctx.roundRect(pillX, pillY, pillW, pillH, 8 / zoom);
       ctx.fillStyle = isSelected
-        ? "rgba(15, 26, 20, 0.9)"
-        : "rgba(15, 26, 20, 0.75)";
+        ? "rgba(255, 255, 255, 0.95)"
+        : "rgba(255, 255, 255, 0.85)";
       ctx.fill();
       ctx.strokeStyle = hexToRgba(section.color, 0.5);
       ctx.lineWidth = 1 / zoom;
@@ -705,13 +705,13 @@ export default function SectionCanvas({
           {/* Zoom percentage display */}
           <div
             style={{
-              background: "rgba(15, 26, 20, 0.85)",
+              background: "rgba(255, 255, 255, 0.85)",
               backdropFilter: "blur(8px)",
               border: "1px solid rgba(64, 145, 108, 0.25)",
               borderRadius: 8,
               padding: "4px 10px",
               textAlign: "center",
-              color: "rgba(165, 214, 167, 0.7)",
+              color: "rgba(45, 106, 79, 0.8)",
               fontSize: 11,
               fontWeight: 600,
               letterSpacing: "0.05em",
@@ -726,11 +726,12 @@ export default function SectionCanvas({
             style={{
               display: "flex",
               flexDirection: "column",
-              background: "rgba(15, 26, 20, 0.85)",
+              background: "rgba(255, 255, 255, 0.85)",
               backdropFilter: "blur(8px)",
               border: "1px solid rgba(64, 145, 108, 0.25)",
               borderRadius: 10,
               overflow: "hidden",
+              color: "#111827",
             }}
           >
             <ZoomBtn
@@ -768,12 +769,12 @@ export default function SectionCanvas({
               position: "absolute",
               bottom: 14,
               left: 14,
-              background: "rgba(15, 26, 20, 0.7)",
+              background: "rgba(255, 255, 255, 0.7)",
               backdropFilter: "blur(6px)",
               border: "1px solid rgba(64, 145, 108, 0.2)",
               borderRadius: 8,
               padding: "4px 10px",
-              color: "rgba(165, 214, 167, 0.5)",
+              color: "rgba(45, 106, 79, 0.7)",
               fontSize: 11,
               userSelect: "none",
               pointerEvents: "none",

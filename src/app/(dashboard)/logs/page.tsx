@@ -1,60 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import type { Land, Section, DailyLog } from "@/lib/types";
+import type { Section } from "@/lib/types";
 
-export default function LogsPage() {
-  const [lands, setLands] = useState<Land[]>([]);
-  const [sections, setSections] = useState<Record<string, Section[]>>({});
-  const [logs, setLogs] = useState<DailyLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedSection, setSelectedSection] = useState<string>("");
+function LogsPageContent() {
+  const searchParams = useSearchParams();
+  const urlSection = searchParams.get("section");
+
+  const { data: lands = [], isLoading: isLandsLoading } = useQuery({
+    queryKey: ["lands"],
+    queryFn: () => api.getLands(),
+  });
+
+  const { data: sectionsMap = {}, isLoading: isSectionsLoading } = useQuery({
+    queryKey: ["sections", lands.map((l) => l.id)],
+    queryFn: async () => {
+      const map: Record<string, Section[]> = {};
+      for (const land of lands) {
+        map[land.id] = await api.getSections(land.id);
+      }
+      return map;
+    },
+    enabled: lands.length > 0,
+  });
+
+  const allSections = Object.values(sectionsMap).flat();
+  const [selectedSection, setSelectedSection] = useState<string>("all");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const landsData = await api.getLands();
-        setLands(landsData);
+    if (urlSection) setSelectedSection(urlSection);
+  }, [urlSection]);
 
-        // Fetch sections for all lands
-        const sectionsMap: Record<string, Section[]> = {};
-        let firstSectionId = "";
-        for (const land of landsData) {
-          const s = await api.getSections(land.id);
-          sectionsMap[land.id] = s;
-          if (!firstSectionId && s.length > 0) {
-            firstSectionId = s[0].id;
-          }
-        }
-        setSections(sectionsMap);
+  const activeSectionId = selectedSection;
 
-        if (firstSectionId) {
-          setSelectedSection(firstSectionId);
-          const logsData = await api.getDailyLogs(firstSectionId);
-          setLogs(logsData);
-        }
-      } catch {
-        // handle error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const { data: logs = [], isLoading: isLogsLoading } = useQuery({
+    queryKey: ["logs", activeSectionId],
+    queryFn: () => activeSectionId === "all" ? api.getAllDailyLogs() : api.getDailyLogs(activeSectionId),
+    enabled: !!activeSectionId,
+  });
 
-  const handleSectionChange = async (sectionId: string) => {
+  const handleSectionChange = (sectionId: string) => {
     setSelectedSection(sectionId);
-    if (sectionId) {
-      const logsData = await api.getDailyLogs(sectionId);
-      setLogs(logsData);
-    } else {
-      setLogs([]);
-    }
   };
 
-  const allSections = Object.values(sections).flat();
+  const isLoading = isLandsLoading || (lands.length > 0 && isSectionsLoading) || (!!activeSectionId && isLogsLoading);
 
   const getWeatherIcon = (condition: string | null) => {
     const icons: Record<string, string> = {
@@ -110,7 +103,7 @@ export default function LogsPage() {
         </div>
         {allSections.length > 0 && (
           <Link
-            href={`/logs/new?section=${selectedSection}`}
+            href={selectedSection !== "all" && selectedSection ? `/logs/new?section=${selectedSection}` : "/logs/new"}
             className="btn btn-primary"
             id="add-log-btn"
           >
@@ -146,12 +139,13 @@ export default function LogsPage() {
               id="log-section-filter"
               className="input-field"
               style={{ maxWidth: "320px" }}
-              value={selectedSection}
+              value={activeSectionId}
               onChange={(e) => handleSectionChange(e.target.value)}
             >
+              <option value="all">All Sections</option>
               {lands.map((land) => (
                 <optgroup key={land.id} label={`🗺️ ${land.name}`}>
-                  {(sections[land.id] || []).map((section) => (
+                  {(sectionsMap[land.id] || []).map((section) => (
                     <option key={section.id} value={section.id}>
                       {section.crop_emoji || "🌱"} {section.name}
                       {section.crop_name ? ` (${section.crop_name})` : ""}
@@ -186,10 +180,15 @@ export default function LogsPage() {
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h3 className="font-semibold text-[var(--foreground)] capitalize">
                         {log.activity_type}
                       </h3>
+                      {activeSectionId === "all" && (
+                        <span className="badge" style={{ background: "var(--bg-secondary)" }}>
+                          📍 {allSections.find(s => s.id === log.section_id)?.name || "Unknown Section"}
+                        </span>
+                      )}
                       <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                         {new Date(log.log_date).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -235,12 +234,12 @@ export default function LogsPage() {
                     </div>
 
                     {/* Expenses breakdown */}
-                    {log.expenses.length > 0 && (
+                    {log.expenses && log.expenses.length > 0 && (
                       <div
                         className="mt-3 pt-3 space-y-1"
                         style={{ borderTop: "1px solid var(--border)" }}
                       >
-                        {log.expenses.map((exp) => (
+                        {log.expenses.map((exp: any) => (
                           <div
                             key={exp.id}
                             className="flex justify-between text-xs"
@@ -264,5 +263,13 @@ export default function LogsPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function LogsPage() {
+  return (
+    <Suspense fallback={<div className="animate-fade-in"><div className="skeleton h-8 w-48 mb-6" /></div>}>
+      <LogsPageContent />
+    </Suspense>
   );
 }

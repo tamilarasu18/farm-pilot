@@ -159,6 +159,14 @@ class ApiClient {
     return this.request<import("./types").DailyLog[]>(`/api/sections/${sectionId}/logs${query}`);
   }
 
+  async getAllDailyLogs(dateFrom?: string, dateTo?: string) {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set("date_from", dateFrom);
+    if (dateTo) params.set("date_to", dateTo);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    return this.request<import("./types").DailyLog[]>(`/api/logs${query}`);
+  }
+
   async createDailyLog(sectionId: string, data: import("./types").DailyLogCreate) {
     return this.request<import("./types").DailyLog>(`/api/sections/${sectionId}/logs`, {
       method: "POST",

@@ -19,6 +19,8 @@ export const metadata: Metadata = {
     "Manage your farmland, plan crops, and track daily farming activities with FarmPilot. The modern farming management platform for smart farmers.",
 };
 
+import { QueryProvider } from "@/lib/query-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,7 +32,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
