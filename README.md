@@ -20,12 +20,14 @@ Farm Pilot is a modern, intuitive dashboard application designed for farmers to 
 ## 📦 Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd farm-pilot
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    # or
@@ -43,6 +45,7 @@ Farm Pilot is a modern, intuitive dashboard application designed for farmers to 
 ## 🛠️ Running the App
 
 To start the development server:
+
 ```bash
 npm run dev
 # or
@@ -50,6 +53,7 @@ yarn dev
 # or
 pnpm dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 🤝 Contributing
