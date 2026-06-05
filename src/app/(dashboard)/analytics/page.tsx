@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
                   <YAxis tick={{ fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
                   <Tooltip 
                     cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", background: "var(--surface)" }}
+                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", background: "var(--color-surface)" }}
                     formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, undefined]}
                   />
                   <Legend iconType="circle" />
