@@ -188,6 +188,26 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  // --- Soil Tests ---
+  async getSoilTests(landId: string) {
+    return this.request<import("./types").SoilTest[]>(`/api/soil-tests/land/${landId}`);
+  }
+
+  async getAllSoilTests() {
+    return this.request<import("./types").SoilTest[]>("/api/soil-tests");
+  }
+
+  async createSoilTest(data: import("./types").SoilTestCreate) {
+    return this.request<import("./types").SoilTest>("/api/soil-tests", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteSoilTest(testId: string) {
+    return this.request<void>(`/api/soil-tests/${testId}`, { method: "DELETE" });
+  }
 }
 
 export class ApiError extends Error {

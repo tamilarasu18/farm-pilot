@@ -200,3 +200,41 @@ export type ExpenseCategory =
   | "water"
   | "transport"
   | "other";
+
+// --- Soil Tests ---
+export interface SoilTestCreate {
+  land_id: string;
+  section_id?: string;
+  test_date: string;
+  lab_name?: string;
+  sample_depth?: string;
+  notes?: string;
+  measurement_unit?: string;
+  ph_level?: number;
+  ec_level?: number;
+  organic_carbon?: number;
+  nitrogen?: number;
+  phosphorus?: number;
+  potassium?: number;
+  micronutrients?: Record<string, number>;
+}
+
+export interface SoilTest {
+  id: string;
+  user_id: string;
+  land_id: string;
+  section_id: string | null;
+  test_date: string;
+  lab_name: string | null;
+  sample_depth: string | null;
+  notes: string | null;
+  measurement_unit: string;
+  ph_level: number | null;
+  ec_level: number | null;
+  organic_carbon: number | null;
+  nitrogen: number | null;
+  phosphorus: number | null;
+  potassium: number | null;
+  micronutrients: Record<string, number> | null;
+  created_at: string;
+}
