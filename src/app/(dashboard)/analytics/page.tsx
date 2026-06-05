@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", background: "var(--surface)" }}
+                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", background: "var(--color-surface)" }}
                     formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, undefined]}
                   />
                 </PieChart>

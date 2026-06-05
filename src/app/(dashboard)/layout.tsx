@@ -40,7 +40,7 @@ export default function DashboardLayout({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
-          background: "var(--surface)",
+          background: "var(--color-surface)",
           borderRight: "1px solid var(--border)",
         }}
       >
@@ -137,7 +137,7 @@ export default function DashboardLayout({
         <header
           className="lg:hidden h-14 flex items-center px-4 shrink-0 sticky top-0 z-30"
           style={{
-            background: "var(--surface)",
+            background: "var(--color-surface)",
             borderBottom: "1px solid var(--border)",
           }}
         >

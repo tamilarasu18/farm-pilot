@@ -382,7 +382,7 @@ function NewLogForm() {
                           background:
                             activityType === act.value
                               ? "rgba(64, 145, 108, 0.15)"
-                              : "var(--surface)",
+                              : "var(--color-surface)",
                           border:
                             activityType === act.value
                               ? "2px solid var(--color-primary-light)"
@@ -448,7 +448,7 @@ function NewLogForm() {
                           background:
                             weatherCondition === w.value
                               ? "rgba(64, 145, 108, 0.15)"
-                              : "var(--surface)",
+                              : "var(--color-surface)",
                           border:
                             weatherCondition === w.value
                               ? "2px solid var(--color-primary-light)"
@@ -611,7 +611,7 @@ function NewLogForm() {
                       key={i}
                       className="flex flex-col sm:flex-row gap-4 items-start sm:items-end p-4 rounded-xl animate-fade-in"
                       style={{
-                        background: "var(--surface)",
+                        background: "var(--color-surface)",
                         border: "1px solid var(--border)",
                       }}
                     >
@@ -777,7 +777,7 @@ function NewLogForm() {
                 {(totalIncome > 0 || totalExpense > 0) && (
                   <div
                     className="flex justify-between items-center pt-4 mt-6 p-4 rounded-xl"
-                    style={{ background: "var(--surface)", border: "2px solid var(--border)" }}
+                    style={{ background: "var(--color-surface)", border: "2px solid var(--border)" }}
                   >
                     <span
                       className="font-bold tracking-wider"

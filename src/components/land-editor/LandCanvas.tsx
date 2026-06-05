@@ -460,7 +460,7 @@ export default function LandCanvas({
         <div
           className="flex flex-wrap items-center gap-2 p-3 rounded-xl"
           style={{
-            background: "var(--surface)",
+            background: "var(--color-surface)",
             border: "1px solid var(--border)",
           }}
         >

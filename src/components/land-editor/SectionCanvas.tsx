@@ -596,7 +596,7 @@ export default function SectionCanvas({
       <div
         className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-xl"
         style={{
-          background: "var(--surface)",
+          background: "var(--color-surface)",
           border: "1px solid var(--border)",
         }}
       >

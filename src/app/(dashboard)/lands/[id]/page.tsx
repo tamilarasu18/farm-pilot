@@ -407,7 +407,7 @@ export default function LandDetailPage({ params }: { params: Promise<{ id: strin
       <div
         className="flex gap-1 mb-6 p-1 rounded-xl w-fit"
         style={{
-          background: "var(--surface)",
+          background: "var(--color-surface)",
           border: "1px solid var(--border)",
         }}
       >
@@ -451,7 +451,7 @@ export default function LandDetailPage({ params }: { params: Promise<{ id: strin
             <div
               className="text-center py-16 rounded-xl"
               style={{
-                background: "var(--surface)",
+                background: "var(--color-surface)",
                 border: "1px solid var(--border)",
               }}
             >

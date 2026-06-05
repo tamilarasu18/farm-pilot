@@ -93,7 +93,7 @@ export default function ProfilePage() {
             />
             <div className="flex flex-col items-center text-center -mt-16 mb-6">
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold shadow-lg mb-4 border-4 border-[var(--surface)]"
+                className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold shadow-lg mb-4 border-4 border-[var(--color-surface)]"
                 style={{
                   background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
                   color: "white",
