@@ -1,47 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { Land, Section } from "@/lib/types";
-import SectionCanvas from "@/components/land-editor/SectionCanvas";
+
+// Dynamically import SectionCanvas to avoid loading heavy map/drawing libraries on initial render
+const SectionCanvas = dynamic(() => import("@/components/land-editor/SectionCanvas"), {
+  ssr: false,
+  loading: () => <div className="skeleton h-[600px] w-full rounded-2xl" />
+});
 
 export default function MapPage() {
-  const [lands, setLands] = useState<Land[]>([]);
   const [activeLandId, setActiveLandId] = useState<string>("");
-  const [sections, setSections] = useState<Section[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchLands = async () => {
-      try {
-        const landsData = await api.getLands();
-        setLands(landsData);
-        if (landsData.length > 0) {
-          setActiveLandId(landsData[0].id);
-        }
-      } catch {
-        setError("Failed to load lands.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchLands();
-  }, []);
+  const { data: lands = [], isLoading: isLoadingLands, error: landsError } = useQuery({
+    queryKey: ["lands"],
+    queryFn: () => api.getLands(),
+  });
 
+  // Set active land automatically when lands load
   useEffect(() => {
-    if (!activeLandId) return;
-    const fetchSections = async () => {
-      try {
-        const sectionsData = await api.getSections(activeLandId);
-        setSections(sectionsData);
-      } catch {
-        // ignore
-      }
-    };
-    fetchSections();
-  }, [activeLandId]);
+    if (lands.length > 0 && !activeLandId) {
+      setActiveLandId(lands[0].id);
+    }
+  }, [lands, activeLandId]);
+
+  const { data: sections = [] } = useQuery({
+    queryKey: ["sections", activeLandId],
+    queryFn: () => api.getSections(activeLandId),
+    enabled: !!activeLandId,
+  });
+
+  const isLoading = isLoadingLands;
+  const error = landsError ? (landsError instanceof Error ? landsError.message : "Failed to load lands.") : "";
 
   if (isLoading) {
     return (

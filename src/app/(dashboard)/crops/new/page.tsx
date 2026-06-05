@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export default function NewCropPage() {
@@ -12,30 +13,33 @@ export default function NewCropPage() {
   const [newCropSeason, setNewCropSeason] = useState("");
   const [newCropDuration, setNewCropDuration] = useState("");
   const [newCropEmoji, setNewCropEmoji] = useState("🌱");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const queryClient = useQueryClient();
+
+  const createCropMutation = useMutation({
+    mutationFn: (newCrop: Parameters<typeof api.createCrop>[0]) => api.createCrop(newCrop),
+    onSuccess: () => {
+      // Invalidate cache so the crops page refetches with the new crop
+      queryClient.invalidateQueries({ queryKey: ["crops_and_summaries"] });
+      router.push("/crops");
+    },
+    onError: (err: any) => {
+      setError(err.message || "Failed to create crop.");
+    }
+  });
 
   const handleCreateCrop = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCropName.trim()) return;
 
-    setIsSubmitting(true);
     setError("");
-    
-    try {
-      await api.createCrop({
-        name: newCropName.trim(),
-        variety: newCropVariety.trim() || undefined,
-        season: newCropSeason.trim() || undefined,
-        growth_duration_days: newCropDuration ? parseInt(newCropDuration) : undefined,
-        icon_emoji: newCropEmoji || "🌱",
-      });
-      
-      router.push("/crops");
-    } catch (err: any) {
-      setError(err.message || "Failed to create crop.");
-      setIsSubmitting(false);
-    }
+    createCropMutation.mutate({
+      name: newCropName.trim(),
+      variety: newCropVariety.trim() || undefined,
+      season: newCropSeason.trim() || undefined,
+      growth_duration_days: newCropDuration ? parseInt(newCropDuration) : undefined,
+      icon_emoji: newCropEmoji || "🌱",
+    });
   };
 
   return (
@@ -135,10 +139,10 @@ export default function NewCropPage() {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={createCropMutation.isPending}
               className="btn btn-primary"
             >
-              {isSubmitting ? "Adding..." : "Add Custom Crop"}
+              {createCropMutation.isPending ? "Adding..." : "Add Custom Crop"}
             </button>
           </div>
         </form>

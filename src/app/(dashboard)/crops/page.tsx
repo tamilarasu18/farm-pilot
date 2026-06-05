@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import type { Crop, Land, Section } from "@/lib/types";
+import type { Crop } from "@/lib/types";
 
 interface ActiveCropSummary {
   crop: Crop;
@@ -12,27 +12,16 @@ interface ActiveCropSummary {
 }
 
 export default function CropsPage() {
-  const [crops, setCrops] = useState<Crop[]>([]);
-  const [activeSummaries, setActiveSummaries] = useState<ActiveCropSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["crops_and_summaries"],
+    queryFn: async () => {
       // 1. Fetch Crop Catalog
       const cropsData = await api.getCrops();
-      setCrops(cropsData);
 
       // 2. Fetch Active Crops (Lands -> Sections)
       const landsData = await api.getLands();
       const summaryMap = new Map<string, { totalAcres: number; count: number }>();
       
-      // We will do this sequentially to avoid rate limiting or too many parallel requests for a large number of lands
       for (const land of landsData) {
         const sections = await api.getSections(land.id);
         sections.forEach(sec => {
@@ -61,15 +50,13 @@ export default function CropsPage() {
 
       // Sort by acreage
       summaries.sort((a, b) => b.totalAcres - a.totalAcres);
-      setActiveSummaries(summaries);
-
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load crop data.");
-    } finally {
-      setIsLoading(false);
+      
+      return { crops: cropsData, summaries };
     }
-  };
+  });
+
+  const crops = data?.crops || [];
+  const activeSummaries = data?.summaries || [];
 
 
 
@@ -89,7 +76,7 @@ export default function CropsPage() {
   if (error) {
     return (
       <div className="p-4 rounded-xl text-center" style={{ background: "rgba(239, 83, 80, 0.1)", color: "var(--color-error)" }}>
-        {error}
+        {error instanceof Error ? error.message : "Failed to load crop data."}
       </div>
     );
   }
