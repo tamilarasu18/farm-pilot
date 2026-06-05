@@ -111,6 +111,14 @@ export interface Crop {
   icon_emoji: string;
 }
 
+export interface CropCreate {
+  name: string;
+  variety?: string;
+  season?: string;
+  growth_duration_days?: number;
+  icon_emoji?: string;
+}
+
 // --- Daily Logs ---
 export interface ExpenseCreate {
   category: string;
@@ -141,6 +149,7 @@ export interface DailyLogCreate {
   crop_stage?: string;
   crop_health_notes?: string;
   expenses?: ExpenseCreate[];
+  incomes?: IncomeCreate[];
 }
 
 export interface DailyLog {
@@ -157,8 +166,45 @@ export interface DailyLog {
   crop_stage: string | null;
   crop_health_notes: string | null;
   expenses: Expense[];
+  incomes: Income[];
   total_expense: number;
+  total_income: number;
   created_at: string;
+}
+
+export interface IncomeCreate {
+  category: string;
+  description?: string;
+  amount: number;
+  currency?: string;
+}
+
+export interface Income {
+  id: string;
+  daily_log_id: string;
+  section_id: string;
+  category: string;
+  description: string | null;
+  amount: number;
+  currency: string;
+  created_at: string;
+}
+
+// --- Analytics ---
+export interface MonthlyFinancials {
+  month: string;
+  month_index: number;
+  revenue: number;
+  expenses: number;
+  profit: number;
+}
+
+export interface AnalyticsResponse {
+  total_revenue: number;
+  total_expenses: number;
+  net_profit: number;
+  monthly_data: MonthlyFinancials[];
+  expense_breakdown: Record<string, number>;
 }
 
 // --- UI Types ---
@@ -199,6 +245,11 @@ export type ExpenseCategory =
   | "fuel"
   | "water"
   | "transport"
+  | "other";
+
+export type IncomeCategory =
+  | "harvest_sale"
+  | "subsidy"
   | "other";
 
 // --- Soil Tests ---

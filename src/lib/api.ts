@@ -189,6 +189,13 @@ class ApiClient {
     });
   }
 
+  async addIncome(logId: string, data: import("./types").IncomeCreate) {
+    return this.request<import("./types").Income>(`/api/logs/${logId}/incomes`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
   // --- Soil Tests ---
   async getSoilTests(landId: string) {
     return this.request<import("./types").SoilTest[]>(`/api/soil-tests/land/${landId}`);
@@ -207,6 +214,12 @@ class ApiClient {
 
   async deleteSoilTest(testId: string) {
     return this.request<void>(`/api/soil-tests/${testId}`, { method: "DELETE" });
+  }
+
+  // --- Analytics ---
+  async getFinancialAnalytics(year?: number) {
+    const query = year ? `?year=${year}` : "";
+    return this.request<import("./types").AnalyticsResponse>(`/api/analytics/finance${query}`);
   }
 }
 

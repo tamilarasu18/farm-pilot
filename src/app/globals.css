@@ -40,6 +40,8 @@
 :root {
   --background: #FAFAFA;
   --foreground: #111827;
+  --surface: #FFFFFF;
+  --surface-light: #F3F4F6;
   --text-secondary: #4B5563;
   --text-muted: #9CA3AF;
   --border: #E5E7EB;
@@ -256,13 +258,13 @@ body {
 }
 
 .btn-secondary {
-  background: var(--surface);
+  background: var(--color-surface);
   color: var(--foreground);
   border: 1px solid var(--border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-light);
+  background: var(--color-surface-light);
   border-color: var(--color-primary-light);
 }
 
@@ -302,7 +304,7 @@ body {
 
 /* === Card === */
 .card {
-  background: var(--surface);
+  background: var(--color-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;

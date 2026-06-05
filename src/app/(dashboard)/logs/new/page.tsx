@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Land, Section, ExpenseCreate } from "@/lib/types";
+import type { Land, Section, ExpenseCreate, IncomeCreate } from "@/lib/types";
 
 const ACTIVITY_TYPES = [
   { value: "planting", label: "Planting", icon: "🌱" },
@@ -36,6 +36,13 @@ const EXPENSE_CATEGORIES = [
   "fuel",
   "water",
   "transport",
+  "transport",
+  "other",
+];
+
+const INCOME_CATEGORIES = [
+  "harvest_sale",
+  "subsidy",
   "other",
 ];
 
@@ -66,6 +73,9 @@ function NewLogForm() {
   const [cropStage, setCropStage] = useState("");
   const [cropHealthNotes, setCropHealthNotes] = useState("");
   const [expenses, setExpenses] = useState<
+    { category: string; description: string; amount: string }[]
+  >([]);
+  const [incomes, setIncomes] = useState<
     { category: string; description: string; amount: string }[]
   >([]);
 
@@ -102,6 +112,20 @@ function NewLogForm() {
     setExpenses(updated);
   };
 
+  const addIncome = () => {
+    setIncomes([...incomes, { category: "harvest_sale", description: "", amount: "" }]);
+  };
+
+  const removeIncome = (index: number) => {
+    setIncomes(incomes.filter((_, i) => i !== index));
+  };
+
+  const updateIncome = (index: number, field: string, value: string) => {
+    const updated = [...incomes];
+    (updated[index] as Record<string, string>)[field] = value;
+    setIncomes(updated);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!sectionId) {
@@ -121,7 +145,7 @@ function NewLogForm() {
           amount: parseFloat(exp.amount),
         }));
 
-      await api.createDailyLog(sectionId, {
+      const log = await api.createDailyLog(sectionId, {
         log_date: logDate,
         activity_type: activityType,
         notes: notes || undefined,
@@ -134,6 +158,21 @@ function NewLogForm() {
         expenses: expenseItems.length > 0 ? expenseItems : undefined,
       });
 
+      // Add incomes if any
+      const incomeItems: IncomeCreate[] = incomes
+        .filter((inc) => inc.amount && parseFloat(inc.amount) > 0)
+        .map((inc) => ({
+          category: inc.category,
+          description: inc.description || undefined,
+          amount: parseFloat(inc.amount),
+        }));
+      
+      if (incomeItems.length > 0) {
+        for (const inc of incomeItems) {
+          await api.addIncome(log.id, inc);
+        }
+      }
+
       await queryClient.invalidateQueries({ queryKey: ["logs"] });
       router.push(`/logs?section=${sectionId}`);
     } catch {
@@ -145,6 +184,11 @@ function NewLogForm() {
 
   const totalExpense = expenses.reduce(
     (sum, e) => sum + (parseFloat(e.amount) || 0),
+    0
+  );
+
+  const totalIncome = incomes.reduce(
+    (sum, inc) => sum + (parseFloat(inc.amount) || 0),
     0
   );
 
@@ -185,7 +229,7 @@ function NewLogForm() {
               {[
                 { num: 1, label: "Activity", desc: "Select land and task" },
                 { num: 2, label: "Climate", desc: "Weather & crop health" },
-                { num: 3, label: "Expenses", desc: "Log any related costs" },
+                { num: 3, label: "Finances", desc: "Log incomes & expenses" },
               ].map((s, idx) => (
                 <div key={s.num} className="relative flex gap-4">
                   {/* Vertical Line */}
@@ -230,7 +274,7 @@ function NewLogForm() {
             </div>
 
             {/* Quick Summary */}
-            {(sectionId || activityType || totalExpense > 0) && (
+            {(sectionId || activityType || totalExpense > 0 || totalIncome > 0) && (
               <div className="mt-8 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
                 <h4 className="text-sm font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>Current Selection</h4>
                 <div className="space-y-3 text-sm">
@@ -250,8 +294,14 @@ function NewLogForm() {
                   )}
                   {totalExpense > 0 && (
                     <div className="flex items-center gap-2 mt-2 pt-2" style={{ borderTop: "1px dashed var(--border)" }}>
-                      <span className="opacity-70">💰</span>
-                      <span className="font-bold text-[var(--foreground)]">₹{totalExpense.toLocaleString()}</span>
+                      <span className="opacity-70">📉</span>
+                      <span className="font-bold text-[var(--color-error)]">- ₹{totalExpense.toLocaleString()}</span>
+                    </div>
+                  )}
+                  {totalIncome > 0 && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="opacity-70">📈</span>
+                      <span className="font-bold text-[var(--color-success)]">+ ₹{totalIncome.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
@@ -524,10 +574,10 @@ function NewLogForm() {
                 <div className="flex items-center justify-between pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
                   <div>
                     <h3 className="font-bold text-lg text-[var(--foreground)]">
-                      Expenses
+                      Financials
                     </h3>
                     <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-                      Log costs associated with this activity
+                      Log incomes (harvest sales) and expenses (costs)
                     </p>
                   </div>
                   <button
@@ -619,19 +669,124 @@ function NewLogForm() {
                   ))}
                 </div>
 
-                {expenses.length > 0 && (
+                  {expenses.length > 0 && (
+                    <div
+                      className="flex justify-between items-center pt-4 mt-2"
+                      style={{ borderTop: "1px solid var(--border)" }}
+                    >
+                      <span
+                        className="text-sm font-semibold uppercase tracking-wider"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Total Expenses
+                      </span>
+                      <span className="text-xl font-bold text-[var(--color-error)]">
+                        - ₹{totalExpense.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+
+                <div className="pt-6" style={{ borderTop: "1px dashed var(--border)" }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-bold text-[var(--foreground)]">Income / Revenue</h4>
+                    <button
+                      type="button"
+                      onClick={addIncome}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      + Add Income
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {incomes.map((inc, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col sm:flex-row gap-4 items-start sm:items-end p-4 rounded-xl animate-fade-in"
+                        style={{
+                          background: "rgba(64, 145, 108, 0.05)",
+                          border: "1px solid rgba(64, 145, 108, 0.2)",
+                        }}
+                      >
+                        <div className="w-full sm:w-1/3">
+                          <label className="input-label text-xs">Category</label>
+                          <select
+                            className="input-field"
+                            value={inc.category}
+                            onChange={(e) => updateIncome(i, "category", e.target.value)}
+                          >
+                            {INCOME_CATEGORIES.map((cat) => (
+                              <option key={cat} value={cat}>
+                                {cat.replace("_", " ").charAt(0).toUpperCase() + cat.replace("_", " ").slice(1)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="w-full sm:flex-1">
+                          <label className="input-label text-xs">Description</label>
+                          <input
+                            type="text"
+                            className="input-field"
+                            placeholder="Sale details"
+                            value={inc.description}
+                            onChange={(e) => updateIncome(i, "description", e.target.value)}
+                          />
+                        </div>
+                        <div className="w-full sm:w-32">
+                          <label className="input-label text-xs">Amount (₹)</label>
+                          <input
+                            type="number"
+                            step="1"
+                            min="0"
+                            className="input-field"
+                            placeholder="0"
+                            value={inc.amount}
+                            onChange={(e) => updateIncome(i, "amount", e.target.value)}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeIncome(i)}
+                          className="btn btn-ghost sm:mb-[2px] w-full sm:w-auto mt-2 sm:mt-0 p-3"
+                          style={{ color: "var(--color-error)", background: "rgba(239, 83, 80, 0.05)" }}
+                        >
+                          ✕ Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {incomes.length > 0 && (
+                    <div
+                      className="flex justify-between items-center pt-4 mt-2"
+                      style={{ borderTop: "1px solid var(--border)" }}
+                    >
+                      <span
+                        className="text-sm font-semibold uppercase tracking-wider"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Total Income
+                      </span>
+                      <span className="text-xl font-bold text-[var(--color-success)]">
+                        + ₹{totalIncome.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {(totalIncome > 0 || totalExpense > 0) && (
                   <div
-                    className="flex justify-between items-center pt-4 mt-2"
-                    style={{ borderTop: "1px solid var(--border)" }}
+                    className="flex justify-between items-center pt-4 mt-6 p-4 rounded-xl"
+                    style={{ background: "var(--surface)", border: "2px solid var(--border)" }}
                   >
                     <span
-                      className="text-sm font-semibold uppercase tracking-wider"
+                      className="font-bold tracking-wider"
                       style={{ color: "var(--text-secondary)" }}
                     >
-                      Total Expenses
+                      NET PROFIT
                     </span>
-                    <span className="text-2xl font-bold text-[var(--color-primary)]">
-                      ₹{totalExpense.toLocaleString()}
+                    <span className="text-3xl font-bold" style={{ color: (totalIncome - totalExpense) >= 0 ? "var(--color-success)" : "var(--color-error)" }}>
+                      ₹{(totalIncome - totalExpense).toLocaleString()}
                     </span>
                   </div>
                 )}
