@@ -2,6 +2,19 @@
 
 Farm Pilot is a modern, intuitive dashboard application designed for farmers to efficiently manage their agricultural operations. Built with Next.js and Tailwind CSS, it provides a seamless user experience for tracking lands, sections, crops, and daily farming activities.
 
+## 📸 Screenshots
+
+| Login / Register | Dashboard |
+| :---: | :---: |
+| ![Login](public/demo_screenshot/login.png) | ![Dashboard with Data](public/demo_screenshot/landing-page-with-data.png) |
+| ![Register](public/demo_screenshot/register.png) | ![Dashboard Empty](public/demo_screenshot/landingpage-without-data.png) |
+
+| Land Management | Daily Logs |
+| :---: | :---: |
+| ![Land Drawing](public/demo_screenshot/land-drawing-page.png) | ![Daily Logs](public/demo_screenshot/daily-logs-page.png) |
+| | ![Create Log](public/demo_screenshot/create-daily-logs.png) |
+
+
 ## 🌟 Features
 
 - **Land Management**: Easily add and manage multiple parcels of land.

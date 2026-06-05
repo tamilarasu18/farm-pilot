@@ -76,18 +76,7 @@ function LogsPageContent() {
     return icons[type] || "📋";
   };
 
-  if (isLoading) {
-    return (
-      <div className="animate-fade-in">
-        <div className="skeleton h-8 w-48 mb-6" />
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton h-24 w-full rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="animate-fade-in">
@@ -101,7 +90,7 @@ function LogsPageContent() {
             Track your daily farming activities
           </p>
         </div>
-        {allSections.length > 0 && (
+        {(!isLoading && allSections.length > 0) && (
           <Link
             href={selectedSection !== "all" && selectedSection ? `/logs/new?section=${selectedSection}` : "/logs/new"}
             className="btn btn-primary"
@@ -112,8 +101,42 @@ function LogsPageContent() {
         )}
       </div>
 
+      {/* Skeleton Loading State */}
+      {isLoading && (
+        <div className="animate-fade-in">
+          {/* Section Filter Skeleton */}
+          <div className="mb-6">
+            <div className="skeleton h-4 w-32 mb-2" />
+            <div className="skeleton h-10 w-full max-w-[320px] rounded-md" />
+          </div>
+          
+          {/* Logs List Skeleton */}
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="card p-4">
+                <div className="flex items-start gap-4">
+                  <div className="skeleton w-12 h-12 rounded-xl shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <div className="skeleton h-5 w-24 rounded" />
+                      <div className="skeleton h-5 w-32 rounded-full" />
+                    </div>
+                    <div className="skeleton h-4 w-3/4 rounded mb-3" />
+                    <div className="flex flex-wrap gap-2">
+                      <div className="skeleton h-6 w-20 rounded-full" />
+                      <div className="skeleton h-6 w-16 rounded-full" />
+                      <div className="skeleton h-6 w-24 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* No lands/sections */}
-      {allSections.length === 0 && (
+      {!isLoading && allSections.length === 0 && (
         <div className="text-center py-20">
           <div className="text-6xl mb-4">📋</div>
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-2">
@@ -128,7 +151,7 @@ function LogsPageContent() {
         </div>
       )}
 
-      {allSections.length > 0 && (
+      {!isLoading && allSections.length > 0 && (
         <>
           {/* Section Filter */}
           <div className="mb-6">

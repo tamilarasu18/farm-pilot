@@ -39,12 +39,20 @@ export default function LandsPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card" style={{ minHeight: "180px" }}>
-              <div className="skeleton h-5 w-32 mb-3" />
-              <div className="skeleton h-4 w-48 mb-2" />
-              <div className="skeleton h-4 w-24" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="card flex flex-row gap-5 items-center p-4">
+              <div className="skeleton w-24 h-24 shrink-0 rounded-2xl" />
+              <div className="flex-1 min-w-0 py-1">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="skeleton h-6 w-32 rounded" />
+                  <div className="skeleton h-6 w-16 rounded-full" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="skeleton h-4 w-24 rounded" />
+                  <div className="skeleton h-4 w-40 rounded" />
+                </div>
+              </div>
             </div>
           ))}
         </div>
